@@ -1,6 +1,5 @@
 import { Application } from "express";
-
-const apiRoute = require("./apis");
+import apiRoute from "./apis/index";
 
 const init = (server: Application) => {
     server.get("*", (req, res, next) =>  {

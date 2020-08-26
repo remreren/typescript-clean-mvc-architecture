@@ -5,4 +5,4 @@ const userRouter = Router();
 
 userRouter.use('/user', userController);
 
-export default userController;
+export default userRouter;
