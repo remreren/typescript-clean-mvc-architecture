@@ -17,9 +17,17 @@ const User = new Schema({
     },
     email: {
         type: String,
-        required: [true, "username is required"],
+        required: [true, "email is required"],
         unique: true,
         lowercase: true
+    },
+    password: {
+        type: String,
+        unique: [true, "password is required"]
+    },
+    secret: {
+        type: Schema.Types.ObjectId,
+        auto: true
     }
 }, {
     timestamps: true,
