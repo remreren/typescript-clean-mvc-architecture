@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 import User from "../../models/user";
 
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +29,24 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
 const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
+        const token = req.headers.authorization;
+
+        if (token !== undefined) {
+            console.log(token);
+            jwt.verify(token, process.env.SECRET_KEY, (err, data) => {
+                if (err) {
+                    return console.log(err);
+                }
+                console.log(data);
+                res.status(200).send(data);
+            });
+        } else {
+            res.status(500).send({
+                message: "token not sent"
+            })
+        }
     } catch (err) {
+        console.log(err);
         return res.status(500).send({
             message: "server error, try again later",
             data: null
