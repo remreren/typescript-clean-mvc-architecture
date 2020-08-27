@@ -5,17 +5,6 @@ import cors from "cors";
 import morgan from "morgan";
 import routes from "../routes/index";
 
-import config from "dotenv";
-
-if (process.env.NODE_ENV !== "production") {
-    const result = config.config();
-    console.log(result.parsed);
-    if (result.error) {
-        console.log("error parsing production");
-        throw result.error;
-    }
-}
-
 const server = express();
 
 const create = (config, db) => {
