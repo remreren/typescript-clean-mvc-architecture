@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import User from "../../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { ResponseModel } from "../../models/response";
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -14,38 +15,33 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
         } = req.body;
 
         if (name == undefined || name == "") {
-            return res.status(422).send({
-                message: "first name not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("first name not sent")
+            );
         }
 
         if (surname == undefined || surname == "") {
-            return res.status(422).send({
-                message: "last name not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("last name not sent")
+            );
         }
 
         if (username == undefined || username == "") {
-            return res.status(422).send({
-                message: "username not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("username not sent")
+            );
         }
 
         if (email == undefined || email == "") {
-            return res.status(422).send({
-                message: "email not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("email not sent")
+            );
         }
 
         if (password == undefined || password == "") {
-            return res.status(422).send({
-                message: "password not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("password not sent")
+            );
         }
 
         const isEmailExists = await User.findOne({
@@ -53,10 +49,9 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
         });
 
         if (isEmailExists) {
-            return res.status(409).send({
-                message: "email already exists",
-                data: null
-            });
+            return res.status(409).send(
+                ResponseModel.error("email already exists")
+            );
         }
 
         const isUsernameExists = await User.findOne({
@@ -64,10 +59,9 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
         });
 
         if (isUsernameExists) {
-            return res.status(409).send({
-                message: "username already exists",
-                data: null
-            });
+            return res.status(409).send(
+                ResponseModel.error("username already")
+            );
         }
 
         const temp = {
@@ -79,24 +73,20 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const newUser = await User.create(temp);
-
         if (newUser) {
-            return res.status(201).send({
-                message: 'user created successfully',
-                data: newUser
-            });
+            return res.status(201).send(
+                ResponseModel.success(newUser)
+            );
         } else {
-            res.status(500).send({
-                message: "something went wrong, try again later",
-                data: null
-            });
+            res.status(500).send(
+                ResponseModel.error("something went wrong, try again later")
+            );
             throw new Error('something went wrong');
         }
     } catch (err) {
-        res.status(500).send({
-            message: "something went wrong, try again later",
-            data: err
-        });
+        res.status(500).send(
+            ResponseModel.error("something went wrong, try again later")
+        );
     }
 }
 
@@ -108,17 +98,15 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
         } = req.body;
 
         if (email == undefined || email == "") {
-            return res.status(422).send({
-                message: "email not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("email not sent")
+            );
         }
 
         if (password == undefined || password == "") {
-            return res.status(422).send({
-                message: "password not sent",
-                data: null
-            });
+            return res.status(422).send(
+                ResponseModel.error("password not sent")
+            );
         }
 
         const user = await User.findOne({
@@ -126,10 +114,9 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
         });
 
         if (!user) {
-            return res.status(404).send({
-                message: "email is not existing",
-                data: null
-            });
+            return res.status(404).send(
+                ResponseModel.error("email not existing")
+            );
         }
 
         const isPasswordCorrect = bcrypt.compareSync(
@@ -138,27 +125,24 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
         );
 
         if (!isPasswordCorrect) {
-            return res.status(401).send({
-                message: "password invalid",
-                data: null
-            })
+            return res.status(401).send(
+                ResponseModel.error("password invalid")
+            );
         }
 
         const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: 86400 });
 
-        res.status(200).send({
-            message: null,
-            data: {
+        res.status(200).send(
+            ResponseModel.success({
                 id: user._id,
                 accessToken: token
-            }
-        });
+            })
+        );
     } catch (err) {
         console.log(err);
-        return res.status(500).send({
-            message: "something went wrong, try again later",
-            data: err
-        });
+        return res.status(500).send(
+            ResponseModel.error("something went wrong, try again later")
+        );
     }
 }
 
